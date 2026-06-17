@@ -1,18 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:portal_news/service/user_provider.dart';
+import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-AppBar buildAppBar() {
+AppBar buildAppBar(BuildContext context) {
+  final user = Provider.of<UserProvider>(context).user;
   return AppBar(
     backgroundColor: Colors.black,
     elevation: 0,
     automaticallyImplyLeading: false,
     title: Row(
       children: [
-        CircleAvatar(
-          radius: 20,
-          backgroundImage: const NetworkImage(
-            "https://upload.wikimedia.org/wikipedia/commons/c/c4/Mark_Zuckerberg_F8_2018_Keynote_%28cropped%29.jpg",
-          ),
+        // CircleAvatar(radius: 20, child: Icon(Icons.person_3_outlined)),
+        StreamBuilder(
+          stream:
+              FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(user?.uid)
+                  .snapshots(),
+          builder: (context, snapshot) {
+            String? imageBase64;
+
+            if (snapshot.hasData && snapshot.data!.exists) {
+              final data = snapshot.data!.data() as Map<String, dynamic>;
+
+              imageBase64 = data['profileImage'];
+            }
+
+            return CircleAvatar(
+              radius: 20,
+              backgroundColor: Colors.teal,
+              backgroundImage:
+                  imageBase64 != null
+                      ? MemoryImage(base64Decode(imageBase64))
+                      : null,
+              child:
+                  imageBase64 == null
+                      ? const Icon(Icons.person_3_outlined)
+                      : null,
+            );
+          },
         ),
         const SizedBox(width: 10),
         Expanded(
@@ -33,41 +62,11 @@ AppBar buildAppBar() {
                 ],
               ),
               Text(
-                "mark zuckerberg",
+                "${user?.displayName}",
                 style: GoogleFonts.playfair(
                   color: Colors.white,
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.grey[900],
-            shape: BoxShape.circle,
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              const Icon(
-                Icons.notifications_outlined,
-                color: Colors.white,
-                size: 24,
-              ),
-              Positioned(
-                top: 10,
-                right: 10,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
                 ),
               ),
             ],

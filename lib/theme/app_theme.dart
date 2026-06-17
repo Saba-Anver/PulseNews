@@ -12,7 +12,7 @@ class AppTheme {
         elevation: 0,
       ),
       textTheme: GoogleFonts.urbanistTextTheme(ThemeData.dark().textTheme),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppConstants.cardBackgroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),

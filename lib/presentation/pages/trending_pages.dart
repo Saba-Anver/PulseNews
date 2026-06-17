@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:portal_news/model/article_model.dart';
-import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:portal_news/utility/utility_functions.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import 'package:portal_news/service/user_provider.dart';
+import 'package:portal_news/presentation/pages/share_users_page.dart';
+import 'package:portal_news/presentation/pages/detail_pages.dart';
 
 class TrendingPage extends StatelessWidget {
   final List<ArticleModel> articles;
@@ -27,203 +34,323 @@ class TrendingPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white, size: 28),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 12),
         itemCount: articles.length,
         itemBuilder: (context, index) {
           final article = articles[index];
-          return _buildArticleItem(context, article);
+          return _buildArticleItem(context, article, index);
         },
       ),
     );
   }
 
-  Widget _buildArticleItem(BuildContext context, ArticleModel article) {
+  Widget _buildArticleItem(
+    BuildContext context,
+    ArticleModel article,
+    int index,
+  ) {
+    final user = Provider.of<UserProvider>(context).user;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                        article.title ?? "No Title",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          height: 1.3,
-                        ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+          Text(
+            "${index + 1}",
+            style: TextStyle(
+              color: Colors.teal,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Card(
+              color: Colors.grey[900],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => NewsDetailPage(article: article),
                     ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        _buildSourceIcon(article.author),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            article.author ?? "Unknown",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              article.title ?? "No Title",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    _buildMetadataRow(article),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
-                  width: 120,
-                  height: 120,
-                  child:
-                      article.urlToImage != null &&
-                              article.urlToImage!.isNotEmpty
-                          ? Image.network(
-                            article.urlToImage!,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                            errorBuilder:
-                                (context, error, stackTrace) => Image.asset(
-                                  'assets/placeholder.jpg',
-                                  fit: BoxFit.cover,
+                            const SizedBox(height: 5),
+                            Row(
+                              children: [
+                                const FaIcon(
+                                  FontAwesomeIcons.user,
+                                  size: 12,
+                                  color: Colors.white54,
                                 ),
-                          )
-                          : Image.asset(
-                            'assets/placeholder.jpg',
-                            fit: BoxFit.cover,
+                                const SizedBox(width: 5),
+                                Expanded(
+                                  child: Text(
+                                    article.author ?? "Unknown",
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              children: [
+                                const FaIcon(
+                                  FontAwesomeIcons.clock,
+                                  size: 12,
+                                  color: Colors.white54,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  article.publishedAt != null
+                                      ? UtilityFunctions.getRelativeTime(
+                                        DateTime.parse(article.publishedAt!),
+                                      )
+                                      : "Unknown",
+                                  style: const TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          article.urlToImage ?? "",
+                          width: 100,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 100,
+                              height: 80,
+                              color: Colors.grey,
+                              child: const Icon(
+                                Icons.image,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Column(
+                        children: [
+                          // IconButton(
+                          //   icon: const Icon(Icons.share, color: Colors.white),
+                          //   onPressed: () async {
+                          //     final message = Uri.encodeComponent(
+                          //       "Check out this article: ${article.url}",
+                          //     );
+                          //     final uri = Uri.parse(
+                          //       "https://wa.me/?text=$message",
+                          //     );
+                          //     await launchUrl(
+                          //       uri,
+                          //       mode: LaunchMode.externalApplication,
+                          //     );
+                          //   },
+                          // ),
+                          IconButton(
+                            icon: const Icon(Icons.share, color: Colors.white),
+
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.grey[900],
+
+                                builder: (context) {
+                                  return SafeArea(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+
+                                      children: [
+                                        ListTile(
+                                          leading: const Icon(
+                                            Icons.groups,
+                                            color: Colors.white,
+                                          ),
+
+                                          title: const Text(
+                                            "Share to Community Chat",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+
+                                          // onTap: () async {
+                                          //   Navigator.pop(context);
+
+                                          //   await FirebaseFirestore.instance
+                                          //       .collection('group_chat')
+                                          //       .add({
+                                          //         'type': 'article',
+
+                                          //         'title': widget.article.title,
+
+                                          //         'description': widget.article.description,
+
+                                          //         'imageUrl': widget.article.urlToImage,
+
+                                          //         'articleUrl': widget.article.url,
+
+                                          //         'senderName': user?.displayName ?? "User",
+
+                                          //         'senderId': user?.uid,
+
+                                          //         'timestamp': FieldValue.serverTimestamp(),
+                                          //       });
+
+                                          //   ScaffoldMessenger.of(context).showSnackBar(
+                                          //     const SnackBar(
+                                          //       content: Text("Shared to Community Chat"),
+                                          //     ),
+                                          //   );
+                                          // },
+                                          onTap: () async {
+                                            Navigator.pop(context);
+
+                                            await FirebaseFirestore.instance
+                                                .collection('group_chat')
+                                                .add({
+                                                  'type': 'article',
+                                                  'title': article.title,
+                                                  'description':
+                                                      article.description,
+                                                  'imageUrl':
+                                                      article.urlToImage,
+                                                  'articleUrl': article.url,
+                                                  'senderName':
+                                                      user?.displayName ??
+                                                      "User",
+                                                  'senderId': user?.uid,
+                                                  'timestamp':
+                                                      FieldValue.serverTimestamp(),
+                                                });
+
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text("Article Shared"),
+                                              ),
+                                            );
+                                          },
+                                        ),
+
+                                        ListTile(
+                                          leading: const Icon(
+                                            Icons.person,
+                                            color: Colors.white,
+                                          ),
+
+                                          title: const Text(
+                                            "Share in Private Chat",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+
+                                          onTap: () {
+                                            Navigator.pop(context);
+
+                                            Navigator.push(
+                                              context,
+
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (_) => ShareUsersPage(
+                                                      article: article,
+                                                    ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+
+                                        ListTile(
+                                          leading: const FaIcon(
+                                            FontAwesomeIcons.whatsapp,
+                                            color: Colors.green,
+                                          ),
+
+                                          title: const Text(
+                                            "Share on WhatsApp",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+
+                                          onTap: () async {
+                                            Navigator.pop(context);
+
+                                            final message = Uri.encodeComponent(
+                                              "Check out this article: ${article.url}",
+                                            );
+
+                                            final uri = Uri.parse(
+                                              "https://wa.me/?text=$message",
+                                            );
+
+                                            await launchUrl(
+                                              uri,
+                                              mode:
+                                                  LaunchMode
+                                                      .externalApplication,
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
                           ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
+            ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.share_outlined, color: Colors.white),
-                onPressed: () {},
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-              IconButton(
-                icon: const Icon(Icons.more_vert, color: Colors.white),
-                onPressed: () {},
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-            ],
-          ),
-          const Divider(color: Colors.grey, height: 24),
         ],
       ),
-    );
-  }
-
-  Widget _buildSourceIcon(String? author) {
-    Widget icon;
-
-    if (author == null || author.isEmpty) {
-      icon = CircleAvatar(
-        radius: 12,
-        backgroundColor: Colors.grey,
-        child: const Text(
-          "?",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-          ),
-        ),
-      );
-    } else {
-      icon = CircleAvatar(
-        radius: 12,
-        backgroundColor: Colors.blue,
-        child: Text(
-          author[0].toUpperCase(),
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-          ),
-        ),
-      );
-    }
-
-    return icon;
-  }
-
-  Widget _buildMetadataRow(ArticleModel article) {
-    String timeAgo = "Unknown";
-    if (article.publishedAt != null) {
-      try {
-        final publishDate = DateTime.parse(article.publishedAt!);
-        final now = DateTime.now();
-        final difference = now.difference(publishDate);
-
-        if (difference.inDays < 1) {
-          timeAgo = "Today";
-        } else {
-          timeAgo = "${difference.inDays} days ago";
-        }
-      } catch (e) {
-        timeAgo = "Invalid date";
-      }
-    }
-    final viewCount = (article.publishedAt?.hashCode.abs() ?? 0) % 300 + 100;
-    final formattedViews = NumberFormat.compact().format(viewCount * 1000);
-
-    final commentCount = (article.title?.hashCode.abs() ?? 0) % 5 + 1;
-    final formattedComments = NumberFormat.compact().format(
-      commentCount * 1000,
-    );
-
-    return Row(
-      children: [
-        Text(timeAgo, style: const TextStyle(color: Colors.grey, fontSize: 14)),
-        const SizedBox(width: 12),
-        const Icon(Icons.visibility_outlined, color: Colors.grey, size: 18),
-        const SizedBox(width: 4),
-        Text(
-          formattedViews,
-          style: const TextStyle(color: Colors.grey, fontSize: 14),
-        ),
-        const SizedBox(width: 12),
-        const Icon(Icons.chat_bubble_outline, color: Colors.grey, size: 16),
-        const SizedBox(width: 4),
-        Text(
-          formattedComments,
-          style: const TextStyle(color: Colors.grey, fontSize: 14),
-        ),
-      ],
     );
   }
 }

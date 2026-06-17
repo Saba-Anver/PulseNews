@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class UtilityFunctions {
   static String formatCount(int count) {
     if (count >= 1000) {

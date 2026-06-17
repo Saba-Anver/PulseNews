@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:portal_news/model/article_model.dart';
 import 'package:portal_news/service/news.dart';
-import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:portal_news/utility/utility_functions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:portal_news/presentation/pages/share_users_page.dart';
+import 'package:portal_news/presentation/pages/detail_pages.dart';
 
 class RecentStoriesPage extends StatefulWidget {
-  const RecentStoriesPage({Key? key, required List<ArticleModel> articles})
-    : super(key: key);
+  const RecentStoriesPage({Key? key}) : super(key: key);
 
   @override
   _RecentStoriesPageState createState() => _RecentStoriesPageState();
@@ -38,11 +41,6 @@ class _RecentStoriesPageState extends State<RecentStoriesPage> {
     });
   }
 
-  String _formatTime(String? time) {
-    if (time == null) return "Unknown";
-    return DateFormat("h:mm a").format(DateTime.parse(time));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,15 +56,9 @@ class _RecentStoriesPageState extends State<RecentStoriesPage> {
         ),
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -129,118 +121,299 @@ class _RecentStoriesPageState extends State<RecentStoriesPage> {
                       itemBuilder: (context, index) {
                         final article = articles[index];
 
+                        // return Card(
+                        //   color: Colors.grey[900],
+                        //   shape: RoundedRectangleBorder(
+                        //     borderRadius: BorderRadius.circular(10),
+                        //   ),
+                        //   margin: const EdgeInsets.symmetric(vertical: 8),
+                        //   child: Padding(
+                        //     padding: const EdgeInsets.all(10),
+                        //     child: Row(
+                        //       crossAxisAlignment: CrossAxisAlignment.center,
+                        //       mainAxisSize: MainAxisSize.min,
+                        //       children: [
                         return Card(
                           color: Colors.grey[900],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                           margin: const EdgeInsets.symmetric(vertical: 8),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        article.title ?? "No Title",
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            FontAwesomeIcons.user,
-                                            size: 12,
-                                            color: Colors.white54,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(10),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => NewsDetailPage(article: article),
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          article.title ?? "No Title",
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
                                           ),
-                                          const SizedBox(width: 5),
-                                          Expanded(
-                                            child: Text(
-                                              article.author ?? "Unknown",
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Row(
+                                          children: [
+                                            const FaIcon(
+                                              FontAwesomeIcons.user,
+                                              size: 12,
+                                              color: Colors.white54,
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Expanded(
+                                              child: Text(
+                                                article.author ?? "Unknown",
+                                                style: const TextStyle(
+                                                  color: Colors.white70,
+                                                  fontSize: 12,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Row(
+                                          children: [
+                                            const FaIcon(
+                                              FontAwesomeIcons.clock,
+                                              size: 12,
+                                              color: Colors.white54,
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              article.publishedAt != null
+                                                  ? UtilityFunctions.getRelativeTime(
+                                                    DateTime.parse(
+                                                      article.publishedAt!,
+                                                    ),
+                                                  )
+                                                  : "Unknown",
                                               style: const TextStyle(
-                                                color: Colors.white70,
+                                                color: Colors.white54,
                                                 fontSize: 12,
                                               ),
-                                              overflow: TextOverflow.ellipsis,
                                             ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      article.urlToImage ?? "",
+                                      width: 100,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (
+                                        context,
+                                        error,
+                                        stackTrace,
+                                      ) {
+                                        return Container(
+                                          width: 100,
+                                          height: 80,
+                                          color: Colors.grey,
+                                          child: const Icon(
+                                            Icons.image,
+                                            color: Colors.white,
                                           ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            FontAwesomeIcons.clock,
-                                            size: 12,
-                                            color: Colors.white54,
-                                          ),
-                                          const SizedBox(width: 5),
-                                          Text(
-                                            _formatTime(article.publishedAt),
-                                            style: const TextStyle(
-                                              color: Colors.white54,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  // Column(
+                                  //   children: [
+                                  //     IconButton(
+                                  //       icon: const Icon(
+                                  //         Icons.share,
+                                  //         color: Colors.white,
+                                  //       ),
+                                  //       onPressed: () async {
+                                  //         final message = Uri.encodeComponent(
+                                  //           "Check out this article: ${article.url}",
+                                  //         );
+                                  //         final uri = Uri.parse(
+                                  //           "https://wa.me/?text=$message",
+                                  //         );
+                                  //         await launchUrl(
+                                  //           uri,
+                                  //           mode: LaunchMode.externalApplication,
+                                  //         );
+                                  //       },
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                  Column(
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.share,
+                                          color: Colors.white,
+                                        ),
+
+                                        onPressed: () {
+                                          showModalBottomSheet(
+                                            context: context,
+                                            backgroundColor: Colors.grey[900],
+
+                                            builder: (context) {
+                                              return SafeArea(
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+
+                                                  children: [
+                                                    ListTile(
+                                                      leading: const Icon(
+                                                        Icons.groups,
+                                                        color: Colors.white,
+                                                      ),
+
+                                                      title: const Text(
+                                                        "Share to Community Chat",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+
+                                                      onTap: () async {
+                                                        Navigator.pop(context);
+
+                                                        await FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                              'group_chat',
+                                                            )
+                                                            .add({
+                                                              'type': 'article',
+                                                              'title':
+                                                                  article.title,
+                                                              'description':
+                                                                  article
+                                                                      .description,
+                                                              'imageUrl':
+                                                                  article
+                                                                      .urlToImage,
+                                                              'articleUrl':
+                                                                  article.url,
+                                                              'senderName':
+                                                                  'User',
+                                                              'timestamp':
+                                                                  FieldValue.serverTimestamp(),
+                                                            });
+
+                                                        ScaffoldMessenger.of(
+                                                          context,
+                                                        ).showSnackBar(
+                                                          const SnackBar(
+                                                            content: Text(
+                                                              "Article Shared",
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+
+                                                    ListTile(
+                                                      leading: const Icon(
+                                                        Icons.person,
+                                                        color: Colors.white,
+                                                      ),
+
+                                                      title: const Text(
+                                                        "Share in Private Chat",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+
+                                                      onTap: () {
+                                                        Navigator.pop(context);
+
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (
+                                                                  _,
+                                                                ) => ShareUsersPage(
+                                                                  article:
+                                                                      article,
+                                                                ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+
+                                                    ListTile(
+                                                      leading: const FaIcon(
+                                                        FontAwesomeIcons
+                                                            .whatsapp,
+                                                        color: Colors.green,
+                                                      ),
+
+                                                      title: const Text(
+                                                        "Share on WhatsApp",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+
+                                                      onTap: () async {
+                                                        Navigator.pop(context);
+
+                                                        final message =
+                                                            Uri.encodeComponent(
+                                                              "Check out this article: ${article.url}",
+                                                            );
+
+                                                        final uri = Uri.parse(
+                                                          "https://wa.me/?text=$message",
+                                                        );
+
+                                                        await launchUrl(
+                                                          uri,
+                                                          mode:
+                                                              LaunchMode
+                                                                  .externalApplication,
+                                                        );
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),
-                                ),
-                                const SizedBox(width: 10),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    article.urlToImage ?? "",
-                                    width: 100,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        width: 100,
-                                        height: 80,
-                                        color: Colors.grey,
-                                        child: const Icon(
-                                          Icons.image,
-                                          color: Colors.white,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                Column(
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                        FontAwesomeIcons.shareNodes,
-                                        color: Colors.white54,
-                                        size: 16,
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.more_vert,
-                                        color: Colors.white54,
-                                        size: 16,
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         );

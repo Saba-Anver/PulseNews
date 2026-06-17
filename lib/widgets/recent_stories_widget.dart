@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:portal_news/model/article_model.dart';
 import 'package:portal_news/presentation/pages/detail_pages.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:portal_news/utility/utility_functions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:portal_news/presentation/pages/share_users_page.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class RecentStoriesWidget extends StatelessWidget {
   final List<ArticleModel> articles;
@@ -17,28 +22,22 @@ class RecentStoriesWidget extends StatelessWidget {
       itemCount: articles.length,
       itemBuilder: (context, index) {
         final article = articles[index];
-        final viewCount = 100 + (index * 200) + (index * 70);
-        String formattedViewCount = viewCount.toString();
-        if (viewCount > 1000) {
-          formattedViewCount = "${(viewCount / 1000).toStringAsFixed(1)}K";
-        }
-
-        final commentCount = index + 2;
 
         return Container(
           margin: EdgeInsets.only(bottom: 16),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NewsDetailPage(article: article),
-                ),
-              );
-            },
-            child: Column(
-              children: [
-                Padding(
+
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NewsDetailPage(article: article),
+                    ),
+                  );
+                },
+                child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,29 +61,33 @@ class RecentStoriesWidget extends StatelessWidget {
                             Row(
                               children: [
                                 CircleAvatar(
-                                  radius: 10,
-                                  backgroundColor:
-                                      Colors.primaries[index %
-                                          Colors.primaries.length],
+                                  radius:
+                                      12, // Increased slightly for better visibility
+                                  backgroundColor: Colors
+                                      .primaries[index %
+                                          Colors.primaries.length]
+                                      .withOpacity(0.8),
                                   child: Text(
-                                    article.author?.substring(
-                                          0,
-                                          article.author!.length.clamp(1, 2),
-                                        ) ??
-                                        "?",
-                                    style: TextStyle(
+                                    (article.author != null &&
+                                            article.author!.isNotEmpty)
+                                        ? article.author![0]
+                                            .toUpperCase() // Show first letter
+                                        : "?",
+                                    style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 8,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 6),
+                                const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     article.author ?? "Unknown Author",
-                                    style: TextStyle(
+                                    style: GoogleFonts.urbanist(
                                       color: Colors.white70,
-                                      fontSize: 12,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -96,35 +99,11 @@ class RecentStoriesWidget extends StatelessWidget {
                             Row(
                               children: [
                                 Text(
-                                  "${index % 3 + 1} ${index % 3 == 0 ? "min" : "mins"} ago",
-                                  style: TextStyle(
-                                    color: Colors.white60,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                SizedBox(width: 16),
-                                Icon(
-                                  Icons.remove_red_eye_outlined,
-                                  color: Colors.white60,
-                                  size: 14,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  formattedViewCount,
-                                  style: TextStyle(
-                                    color: Colors.white60,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                SizedBox(width: 16),
-                                Icon(
-                                  Icons.chat_bubble_outline,
-                                  color: Colors.white60,
-                                  size: 14,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  commentCount.toString(),
+                                  article.publishedAt != null
+                                      ? UtilityFunctions.getRelativeTime(
+                                        DateTime.parse(article.publishedAt!),
+                                      )
+                                      : "Unknown",
                                   style: TextStyle(
                                     color: Colors.white60,
                                     fontSize: 12,
@@ -141,6 +120,10 @@ class RecentStoriesWidget extends StatelessWidget {
                         height: 96,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.teal.withOpacity(0.3),
+                            width: 1,
+                          ),
                           image: DecorationImage(
                             image: NetworkImage(article.urlToImage ?? ""),
                             fit: BoxFit.cover,
@@ -151,20 +134,150 @@ class RecentStoriesWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Icon(Icons.share, color: Colors.white60, size: 18),
-                      SizedBox(width: 16),
-                      Icon(Icons.more_vert, color: Colors.white60, size: 18),
-                    ],
-                  ),
+              ),
+              SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    // IconButton(
+                    //   icon: const Icon(
+                    //     Icons.share,
+                    //     color: Colors.white,
+                    //     size: 16,
+                    //   ),
+                    //   onPressed: () async {
+                    //     final message = Uri.encodeComponent(
+                    //       "Check out this article: ${article.url}",
+                    //     );
+                    //     final uri = Uri.parse("https://wa.me/?text=$message");
+                    //     await launchUrl(
+                    //       uri,
+                    //       mode: LaunchMode.externalApplication,
+                    //     );
+                    //   },
+                    // ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.share,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.grey[900],
+
+                          builder: (context) {
+                            return SafeArea(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+
+                                children: [
+                                  ListTile(
+                                    leading: const Icon(
+                                      Icons.groups,
+                                      color: Colors.white,
+                                    ),
+
+                                    title: const Text(
+                                      "Share to Community Chat",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+
+                                    onTap: () async {
+                                      Navigator.pop(context);
+
+                                      await FirebaseFirestore.instance
+                                          .collection('group_chat')
+                                          .add({
+                                            'type': 'article',
+                                            'title': article.title,
+                                            'description': article.description,
+                                            'imageUrl': article.urlToImage,
+                                            'articleUrl': article.url,
+                                            'senderName': 'User',
+                                            'timestamp':
+                                                FieldValue.serverTimestamp(),
+                                          });
+
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text("Article Shared"),
+                                        ),
+                                      );
+                                    },
+                                  ),
+
+                                  ListTile(
+                                    leading: const Icon(
+                                      Icons.person,
+                                      color: Colors.white,
+                                    ),
+
+                                    title: const Text(
+                                      "Share in Private Chat",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+
+                                    onTap: () {
+                                      Navigator.pop(context);
+
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (_) => ShareUsersPage(
+                                                article: article,
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+
+                                  ListTile(
+                                    leading: const FaIcon(
+                                      FontAwesomeIcons.whatsapp,
+                                      color: Colors.green,
+                                    ),
+
+                                    title: const Text(
+                                      "Share on WhatsApp",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+
+                                    onTap: () async {
+                                      Navigator.pop(context);
+
+                                      final message = Uri.encodeComponent(
+                                        "Check out this article: ${article.url}",
+                                      );
+
+                                      final uri = Uri.parse(
+                                        "https://wa.me/?text=$message",
+                                      );
+
+                                      await launchUrl(
+                                        uri,
+                                        mode: LaunchMode.externalApplication,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },

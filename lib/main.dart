@@ -16,12 +16,12 @@ void main() async {
 
     // 2. Manual Initialization using your specific JSON data
     await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: "AIzaSyDIaFlrs_y3jdInTLEPQFEHOUugaClX7OE",
-        appId: "1:519357833317:android:cf7cab9499fd133b53268c",
-        messagingSenderId: "519357833317",
-        projectId: "newsapp-4ade3",
-        storageBucket: "newsapp-4ade3.firebasestorage.app",
+      options: FirebaseOptions(
+        apiKey: dotenv.env['FIREBASE_API_KEY']!,
+        appId: dotenv.env['FIREBASE_APP_ID']!,
+        messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
+        projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
+        storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
       ),
     );
 

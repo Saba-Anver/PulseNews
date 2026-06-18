@@ -11,6 +11,7 @@ My Extensions
 - Used Firestore for storing user bookmarks.
 - Implemented Profile page that allows changing profile pictures and shows your name and total bookmarks.
 - Implemented search functionality that lets you search news by any word.
+- Implemented group chat and single person chat between users of the app.
 
 Installation
 

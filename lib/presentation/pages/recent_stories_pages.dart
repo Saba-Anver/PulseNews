@@ -120,19 +120,6 @@ class _RecentStoriesPageState extends State<RecentStoriesPage> {
                       itemCount: articles.length,
                       itemBuilder: (context, index) {
                         final article = articles[index];
-
-                        // return Card(
-                        //   color: Colors.grey[900],
-                        //   shape: RoundedRectangleBorder(
-                        //     borderRadius: BorderRadius.circular(10),
-                        //   ),
-                        //   margin: const EdgeInsets.symmetric(vertical: 8),
-                        //   child: Padding(
-                        //     padding: const EdgeInsets.all(10),
-                        //     child: Row(
-                        //       crossAxisAlignment: CrossAxisAlignment.center,
-                        //       mainAxisSize: MainAxisSize.min,
-                        //       children: [
                         return Card(
                           color: Colors.grey[900],
                           shape: RoundedRectangleBorder(
@@ -245,28 +232,6 @@ class _RecentStoriesPageState extends State<RecentStoriesPage> {
                                     ),
                                   ),
                                   const SizedBox(width: 5),
-                                  // Column(
-                                  //   children: [
-                                  //     IconButton(
-                                  //       icon: const Icon(
-                                  //         Icons.share,
-                                  //         color: Colors.white,
-                                  //       ),
-                                  //       onPressed: () async {
-                                  //         final message = Uri.encodeComponent(
-                                  //           "Check out this article: ${article.url}",
-                                  //         );
-                                  //         final uri = Uri.parse(
-                                  //           "https://wa.me/?text=$message",
-                                  //         );
-                                  //         await launchUrl(
-                                  //           uri,
-                                  //           mode: LaunchMode.externalApplication,
-                                  //         );
-                                  //       },
-                                  //     ),
-                                  //   ],
-                                  // ),
                                   Column(
                                     children: [
                                       IconButton(

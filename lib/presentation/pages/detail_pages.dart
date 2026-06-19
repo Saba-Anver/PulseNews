@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:portal_news/service/grok_service.dart';
 import 'package:portal_news/presentation/pages/share_users_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:portal_news/presentation/pages/detail_pages.dart';
 
 class NewsDetailPage extends StatefulWidget {
   final ArticleModel article;
@@ -190,16 +189,6 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
               );
             },
           ),
-          // IconButton(
-          //   icon: const Icon(Icons.share, color: Colors.white),
-          //   onPressed: () async {
-          //     final message = Uri.encodeComponent(
-          //       "Check out this article: ${widget.article.url}",
-          //     );
-          //     final uri = Uri.parse("https://wa.me/?text=$message");
-          //     await launchUrl(uri, mode: LaunchMode.externalApplication);
-          //   },
-          // ),
           IconButton(
             icon: const Icon(Icons.share, color: Colors.white),
 
@@ -225,35 +214,6 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
                             style: TextStyle(color: Colors.white),
                           ),
 
-                          // onTap: () async {
-                          //   Navigator.pop(context);
-
-                          //   await FirebaseFirestore.instance
-                          //       .collection('group_chat')
-                          //       .add({
-                          //         'type': 'article',
-
-                          //         'title': widget.article.title,
-
-                          //         'description': widget.article.description,
-
-                          //         'imageUrl': widget.article.urlToImage,
-
-                          //         'articleUrl': widget.article.url,
-
-                          //         'senderName': user?.displayName ?? "User",
-
-                          //         'senderId': user?.uid,
-
-                          //         'timestamp': FieldValue.serverTimestamp(),
-                          //       });
-
-                          //   ScaffoldMessenger.of(context).showSnackBar(
-                          //     const SnackBar(
-                          //       content: Text("Shared to Community Chat"),
-                          //     ),
-                          //   );
-                          // },
                           onTap: () async {
                             Navigator.pop(context);
 

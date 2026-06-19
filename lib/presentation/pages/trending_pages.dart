@@ -171,21 +171,6 @@ class TrendingPage extends StatelessWidget {
                       const SizedBox(width: 5),
                       Column(
                         children: [
-                          // IconButton(
-                          //   icon: const Icon(Icons.share, color: Colors.white),
-                          //   onPressed: () async {
-                          //     final message = Uri.encodeComponent(
-                          //       "Check out this article: ${article.url}",
-                          //     );
-                          //     final uri = Uri.parse(
-                          //       "https://wa.me/?text=$message",
-                          //     );
-                          //     await launchUrl(
-                          //       uri,
-                          //       mode: LaunchMode.externalApplication,
-                          //     );
-                          //   },
-                          // ),
                           IconButton(
                             icon: const Icon(Icons.share, color: Colors.white),
 
@@ -212,36 +197,6 @@ class TrendingPage extends StatelessWidget {
                                               color: Colors.white,
                                             ),
                                           ),
-
-                                          // onTap: () async {
-                                          //   Navigator.pop(context);
-
-                                          //   await FirebaseFirestore.instance
-                                          //       .collection('group_chat')
-                                          //       .add({
-                                          //         'type': 'article',
-
-                                          //         'title': widget.article.title,
-
-                                          //         'description': widget.article.description,
-
-                                          //         'imageUrl': widget.article.urlToImage,
-
-                                          //         'articleUrl': widget.article.url,
-
-                                          //         'senderName': user?.displayName ?? "User",
-
-                                          //         'senderId': user?.uid,
-
-                                          //         'timestamp': FieldValue.serverTimestamp(),
-                                          //       });
-
-                                          //   ScaffoldMessenger.of(context).showSnackBar(
-                                          //     const SnackBar(
-                                          //       content: Text("Shared to Community Chat"),
-                                          //     ),
-                                          //   );
-                                          // },
                                           onTap: () async {
                                             Navigator.pop(context);
 

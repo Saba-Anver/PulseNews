@@ -38,15 +38,6 @@ class _MainPageState extends State<MainPage> {
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        // items: const [
-        //   BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-        //   BottomNavigationBarItem(icon: Icon(Icons.explore), label: "Discover"),
-        //   BottomNavigationBarItem(
-        //     icon: Icon(Icons.bookmark),
-        //     label: "Bookmark",
-        //   ),
-        //   BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-        // ],
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
 

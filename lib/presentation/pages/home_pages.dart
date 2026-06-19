@@ -175,17 +175,6 @@ class _HomePageState extends State<HomePage> {
           },
         ),
       ),
-      // floatingActionButton: FloatingActionButton.extended(
-      //   backgroundColor: Colors.teal,
-      //   icon: const Icon(Icons.auto_awesome, color: Colors.white),
-      //   label: const Text(
-      //     "Today's Briefing",
-      //     style: TextStyle(color: Colors.white),
-      //   ),
-      //   onPressed: () {
-      //     _newsFuture.then((articles) => _showDailyBriefing(articles));
-      //   },
-      // ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [

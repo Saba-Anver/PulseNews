@@ -40,23 +40,6 @@ class _LoginPageState extends State<LoginPage> {
 
       setState(() => _isLoading = false);
 
-      // if (result == "Success") {
-      //   // If successful, the StreamBuilder in main.dart will automatically
-      //   // switch to the Main Page, but you can also navigate manually:
-      //   if (!mounted) return;
-      //   Navigator.pushReplacement(
-      //     context,
-      //     MaterialPageRoute(builder: (context) => MainPage()),
-      //   );
-      // } else {
-      //   // Show error from Firebase (e.g., "Wrong password")
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     SnackBar(
-      //       content: Text(result ?? "An error occurred"),
-      //       backgroundColor: Colors.redAccent,
-      //     ),
-      //   );
-      // }
       if (result == "Success") {
         if (_isLogin) {
           if (!mounted) return;

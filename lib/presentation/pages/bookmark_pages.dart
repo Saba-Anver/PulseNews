@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:portal_news/model/article_model.dart';
 import 'package:portal_news/presentation/pages/detail_pages.dart';

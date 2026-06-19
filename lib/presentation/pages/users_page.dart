@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'private_chat_page.dart';
 
 class UsersPage extends StatelessWidget {
@@ -51,12 +50,10 @@ class UsersPage extends StatelessWidget {
                 color: Colors.grey.shade900,
 
                 child: ListTile(
-                  // leading: const CircleAvatar(child: Icon(Icons.person)),
                   leading: StreamBuilder(
                     stream:
                         FirebaseFirestore.instance
                             .collection('private_chats')
-                            // .doc([currentUser.uid, user.id]..sort().join("_"))
                             .doc(([currentUser.uid, user.id]..sort()).join("_"))
                             .collection('messages')
                             .where('receiverId', isEqualTo: currentUser.uid)
@@ -101,11 +98,6 @@ class UsersPage extends StatelessWidget {
                       );
                     },
                   ),
-
-                  // title: Text(
-                  //   user['name'],
-                  //   style: const TextStyle(color: Colors.white),
-                  // ),
                   title: Text(
                     user.data().toString().contains('name')
                         ? user['name']

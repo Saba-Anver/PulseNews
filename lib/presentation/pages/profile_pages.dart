@@ -61,15 +61,6 @@ class ProfilePages extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                // CircleAvatar(
-                //   radius: 60,
-                //   backgroundColor: Colors.teal,
-                //   child: const Icon(
-                //     Icons.person,
-                //     color: Colors.white,
-                //     size: 60,
-                //   ),
-                // ),
                 StreamBuilder<DocumentSnapshot>(
                   stream:
                       FirebaseFirestore.instance
@@ -92,22 +83,6 @@ class ProfilePages extends StatelessWidget {
                           await pickAndSaveImage(user);
                         }
                       },
-                      // child: CircleAvatar(
-                      //   radius: 60,
-                      //   backgroundColor: Colors.teal,
-                      //   backgroundImage:
-                      //       imageBase64 != null
-                      //           ? MemoryImage(base64Decode(imageBase64))
-                      //           : null,
-                      //   child:
-                      //       imageBase64 == null
-                      //           ? const Icon(
-                      //             Icons.person,
-                      //             color: Colors.white,
-                      //             size: 60,
-                      //           )
-                      //           : null,
-                      // ),
                       child: Stack(
                         children: [
                           CircleAvatar(
@@ -187,26 +162,6 @@ class ProfilePages extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 20),
-
-                // Logout Button
-                // ElevatedButton.icon(
-                //   onPressed: () async {
-                //     await FirebaseAuth.instance.signOut();
-                //   },
-                //   icon: const Icon(Icons.logout),
-                //   label: const Text("Logout"),
-                //   style: ElevatedButton.styleFrom(
-                //     backgroundColor: Colors.teal[700],
-                //     foregroundColor: Colors.white,
-                //     padding: const EdgeInsets.symmetric(
-                //       vertical: 14,
-                //       horizontal: 40,
-                //     ),
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(12),
-                //     ),
-                //   ),
-                // ),
                 ElevatedButton.icon(
                   onPressed: () async {
                     await FirebaseAuth.instance.signOut();

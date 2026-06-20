@@ -33,7 +33,11 @@ class _RecentStoriesPageState extends State<RecentStoriesPage> {
     });
 
     News newsService = News();
-    await newsService.getNews(category: selectedCategory);
+    try {
+      await newsService.getNews(category: selectedCategory);
+    } catch (e) {
+      print("fetchNews error: $e");
+    }
 
     setState(() {
       articles = newsService.news;

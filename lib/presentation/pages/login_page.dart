@@ -86,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
                 const Icon(Icons.newspaper, color: Colors.teal, size: 80),
                 const SizedBox(height: 10),
                 const Text(
-                  "Portal News",
+                  "Pulse News",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,

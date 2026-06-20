@@ -228,7 +228,14 @@ class _HomePageState extends State<HomePage> {
             selectedCategory: _selectedCategory,
             onCategoryChanged: _changeCategory,
           ),
-          RecentStoriesWidget(articles: articles),
+          articles.isEmpty
+              ? const Center(
+                child: Text(
+                  "No recent stories found",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              )
+              : RecentStoriesWidget(articles: articles),
         ],
       ),
     );

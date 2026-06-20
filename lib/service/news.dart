@@ -51,25 +51,25 @@ class News {
       case "Business":
         // Using everything + business keyword + Pakistan context for freshness
         url =
-            "https://newsapi.org/v2/everything?q=business AND (Pakistan OR global)&sortBy=publishedAt&language=en&apiKey=$_apiKey";
+            "https://newsapi.org/v2/everything?q=business AND (Pakistan OR global)&sortBy=publishedAt&language=en&apiKey=$_apiKey&excludeDomains=timesofindia.com,ndtv.com,hindustantimes.com,indiatoday.in";
         break;
 
       case "Technology":
         // TechCrunch is good, but adding publishedAt ensures you don't see yesterday's lead story
         url =
-            "https://newsapi.org/v2/top-headlines?sources=techcrunch&sortBy=publishedAt&apiKey=$_apiKey";
+            "https://newsapi.org/v2/everything?q=artificial intelligence OR machine learning OR cybersecurity&sortBy=publishedAt&language=en&apiKey=$_apiKey&excludeDomains=timesofindia.com,ndtv.com,hindustantimes.com,indiatoday.in";
         break;
 
       case "Politics":
         // Replacing the limited WSJ domain with a broader politics search
         url =
-            "https://newsapi.org/v2/everything?q=politics&sortBy=publishedAt&language=en&apiKey=$_apiKey";
+            "https://newsapi.org/v2/everything?q=politics&sortBy=publishedAt&language=en&apiKey=$_apiKey&excludeDomains=timesofindia.com,ndtv.com,hindustantimes.com,indiatoday.in";
         break;
 
       default:
         // General 'Latest' feed - looking for breaking news globally
         url =
-            "https://newsapi.org/v2/top-headlines?country=us&category=general&apiKey=$_apiKey";
+            "https://newsapi.org/v2/top-headlines?category=general&apiKey=$_apiKey&excludeDomains=timesofindia.com,ndtv.com,hindustantimes.com,indiatoday.in";
         break;
     }
     try {
@@ -95,7 +95,14 @@ class News {
               author: element['author'],
               publishedAt: element['publishedAt'],
             );
-            news.add(articleModel);
+
+            final difference = DateTime.parse(
+              articleModel.publishedAt!,
+            ).difference(DateTime.now());
+
+            if (difference.inDays >= -5 && difference.inDays <= 0) {
+              news.add(articleModel);
+            }
           }
         });
       }

@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
       create: (_) => UserProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Portal News',
+        title: 'Pulse News',
         theme: ThemeData(
           primarySwatch: Colors.teal,
           appBarTheme: const AppBarTheme(

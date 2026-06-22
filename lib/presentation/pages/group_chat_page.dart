@@ -19,7 +19,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
     final message = controller.text.trim();
 
     if (message.isEmpty) return;
-
+    print(FirebaseAuth.instance.currentUser);
     controller.clear();
 
     final userDoc =
@@ -27,6 +27,9 @@ class _GroupChatPageState extends State<GroupChatPage> {
             .collection('users')
             .doc(currentUser.uid)
             .get();
+
+    print(userDoc.exists);
+    print(userDoc.data());
 
     await FirebaseFirestore.instance.collection('group_chat').add({
       'type': 'text',
